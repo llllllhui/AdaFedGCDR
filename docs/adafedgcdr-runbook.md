@@ -19,6 +19,28 @@ UV_CACHE_DIR="$PWD/.uv-cache" uv sync --extra dev
 .venv/bin/python -m pytest tests -q
 ```
 
+## 获取 Amazon 原始数据并转换
+
+原始数据来自 UCSD Amazon Review Data (2018)（Ni et al., EMNLP 2019）：https://nijianmo.github.io/amazon/index.html 。使用按领域的 "ratings only" CSV（无表头，四列 `item,user,rating,timestamp`，时间戳为 Unix **秒**），例如：
+
+- Books：https://jmcauley.ucsd.edu/data/amazon_v2/categoryFilesSmall/Books.csv
+- CDs and Vinyl：https://jmcauley.ucsd.edu/data/amazon_v2/categoryFilesSmall/CDs_and_Vinyl.csv
+- Movies and TV：https://jmcauley.ucsd.edu/data/amazon_v2/categoryFilesSmall/Movies_and_TV.csv
+
+其余领域的文件名与 `legacy/Data_Proc.py` 中的列表一致，URL 前缀均为 `https://jmcauley.ucsd.edu/data/amazon_v2/categoryFilesSmall/`。下载后放入本地目录（如 `data/raw/`，不入 Git），再用转换脚本生成契约 CSV：
+
+```bash
+.venv/bin/python scripts/prepare_amazon_events.py \
+  --domain Books=data/raw/Books.csv --domain CDs=data/raw/CDs_and_Vinyl.csv \
+  --target Books --user-core 10 --item-core 10 \
+  --out data/private/events.csv
+```
+
+- 每行评分视为一次正向交互，不按评分过滤；时间戳自动乘 1000 转为毫秒；`--domain` 可重复多次加入更多源域，支持 `.gz`。
+- `--user-core` / `--item-core` 控制每领域用户/物品最少交互数，可用 `--user-core Books=96` 形式对单域覆盖（论文参考阈值见 `legacy/Data_Proc.py`）。Books 全量约 5100 万行，不过滤会让 `train-base` 不可行。
+- 脚本不去重：重复 `(user_id, domain, item_id)` 由管线 `load_events` 保留最早时间戳；core 过滤前的计数也包含全部行。
+- 脚本结束时输出总用户数、桥接用户数与预估合格用户数（未去重口径，权威口径以 `prepare` 的审计文件为准）。合格用户过少时先调整领域组合或阈值，再进入四命令流程。
+
 ## 输入数据契约
 
 输入为带时间戳的本地 CSV，默认放在 `data/private/events.csv`（该目录已被 `.gitignore` 排除，数据不得提交到 Git）：

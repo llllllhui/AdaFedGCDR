@@ -1,6 +1,7 @@
 .venv/
 .uv-cache/
 data/private/
+data/raw/
 artifacts/
 __pycache__/
 .pytest_cache/
