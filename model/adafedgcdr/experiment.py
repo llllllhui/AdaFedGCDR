@@ -156,7 +156,7 @@ def fuse_user_vec(method: str, fusion: AdaptiveFusion, batch):
         weight = torch.ones(count.shape[0], device=source_vec.device)
     elif method == "source-only":
         weight = torch.zeros(count.shape[0], device=source_vec.device)
-    elif method == "fixed-0.5":
+    elif method in ("fixed-0.5", "reliability-only"):
         weight = torch.full((count.shape[0],), 0.5, device=source_vec.device)
     else:
         weight = count / (count + F.softplus(fusion.tau_raw))

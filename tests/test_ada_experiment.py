@@ -209,6 +209,37 @@ def test_full_method_matches_fusion_module():
     assert torch.equal(personalized_mask, ref_mask)
 
 
+def test_reliability_only_uses_gated_sources_with_fixed_fusion():
+    artifacts, catalog, cases = make_fixture()
+    model = AdaptiveFusion(num_sources=1)
+    rows, _ = _prepare_rows(cases["validation"], artifacts, catalog, small_config())
+    batch = _collate(rows, torch.device("cpu"))
+    _, _, source_weight, _ = model(
+        batch["source_vec"], batch["source_mask"], batch["source_count"], batch["history_vec"], batch["history_mask"]
+    )
+    gated_source = (source_weight[..., None] * batch["source_vec"]).sum(dim=1)
+    count = batch["history_mask"].sum(dim=1)
+    local = (batch["history_vec"] * batch["history_mask"][..., None]).sum(dim=1) / count.clamp_min(1)[:, None]
+    expected = torch.where((count > 0)[:, None], 0.5 * gated_source + 0.5 * local, gated_source)
+
+    reliability_vec, _ = fuse_user_vec("reliability-only", model, batch)
+    assert torch.allclose(reliability_vec, expected)
+
+    full_vec, _ = fuse_user_vec("full", model, batch)
+    dynamic = count / (count + torch.nn.functional.softplus(model.tau_raw))
+    dynamic_differs = (count > 0) & (dynamic != 0.5)
+    assert dynamic_differs.any()
+    assert torch.allclose(reliability_vec[~dynamic_differs], full_vec[~dynamic_differs])
+    assert not torch.allclose(reliability_vec[dynamic_differs], full_vec[dynamic_differs])
+
+    with torch.no_grad():
+        model.tau_raw.fill_(3.0)
+    reliability_after, _ = fuse_user_vec("reliability-only", model, batch)
+    full_after, _ = fuse_user_vec("full", model, batch)
+    assert torch.allclose(reliability_after, reliability_vec)
+    assert not torch.allclose(full_after, full_vec)
+
+
 def test_evaluate_reports_all_methods_with_statistics():
     artifacts, catalog, cases = make_fixture()
     config = small_config()
