@@ -119,6 +119,13 @@ def make_cases(events: list[Event], manifest: SplitManifest, k_values=DEFAULT_K_
     return cases
 
 
+def select_group_cases(cases: list[Case], manifest: SplitManifest, group: str) -> list[Case]:
+    if group not in GROUPS:
+        raise ValueError(f"未知分组 {group}，应为 {GROUPS}")
+    allowed = set(manifest.users[group])
+    return [case for case in cases if case.user_id in allowed]
+
+
 def audit_users(events: list[Event], target: str, k_values=DEFAULT_K_VALUES) -> dict[str, int]:
     counts = {"total_users": 0, "qualified": 0, "no_target": 0, "insufficient_target": 0, "no_usable_source": 0}
     for view in user_views(events, target).values():

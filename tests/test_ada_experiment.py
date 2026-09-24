@@ -1,0 +1,154 @@
+import sys
+from pathlib import Path
+
+import pytest
+import torch
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from model.adafedgcdr.base import BaseArtifacts
+from model.adafedgcdr.data import Case
+from model.adafedgcdr.experiment import (
+    Catalog,
+    EvalCheckpoint,
+    FusionConfig,
+    evaluate,
+    sample_candidates,
+    stage_balanced_loss,
+    train_fusion,
+)
+
+D = 4
+SEED = 2026
+K_VALUES = (0, 1, 3, 5, 10)
+
+
+def make_catalog(num_items=30, users=("u0", "u1", "u2", "u3")):
+    items = tuple(f"t{i:02d}" for i in range(num_items))
+    user_items = {}
+    for u_index, user_id in enumerate(users):
+        user_items[user_id] = frozenset(items[(i + u_index * 13) % num_items] for i in range(12))
+    popularity = {item: 1 for item in items}
+    return Catalog(items=items, user_items=user_items, popularity=popularity)
+
+
+def make_user_cases(user_id, item_seq):
+    return [Case(user_id, k, tuple(item_seq[:k]), item_seq[k]) for k in K_VALUES]
+
+
+def make_fixture(num_items=30):
+    catalog = make_catalog(num_items)
+    items = list(catalog.items)
+    target_items = {item: i for i, item in enumerate(items)}
+    target_item_vectors = torch.stack([torch.full((D,), (i + 1) / 10.0) for i in range(num_items)])
+    users = ["u0", "u1", "u2", "u3"]
+    source_vectors = {}
+    source_counts = {}
+    source_mask = {}
+    for u_index, user_id in enumerate(users):
+        source_vectors[user_id] = torch.full((1, D), float(u_index + 1))
+        source_counts[user_id] = torch.tensor([float(u_index + 1)])
+        source_mask[user_id] = torch.tensor([True])
+    artifacts = BaseArtifacts(
+        domain_names=["CDs"],
+        source_vectors=source_vectors,
+        source_counts=source_counts,
+        source_mask=source_mask,
+        target_items=target_items,
+        target_item_vectors=target_item_vectors,
+        target_train_users=["u0", "u1"],
+        split_sha256="split-digest",
+    )
+    sequences = {user_id: sorted(catalog.user_items[user_id]) for user_id in users}
+    cases = {
+        "fusion": make_user_cases("u0", sequences["u0"]) + make_user_cases("u1", sequences["u1"]),
+        "validation": make_user_cases("u2", sequences["u2"]),
+    }
+    return artifacts, catalog, cases
+
+
+def make_eval_cases(artifact_user="u3", num_items=30):
+    catalog = make_catalog(num_items)
+    seq = sorted(catalog.user_items[artifact_user])
+    return make_user_cases(artifact_user, seq)
+
+
+def small_config(**overrides):
+    values = dict(seed=SEED, candidate_count=8, max_epochs=2, patience=2, batch_size=4, device="cpu")
+    values.update(overrides)
+    return FusionConfig(**values)
+
+
+def test_negative_sampling_contract():
+    catalog = make_catalog(150)
+    case = Case(user_id="u0", k=3, history_item_ids=("t00", "t01", "t02"), label_item_id="t03")
+    candidates = sample_candidates(case, catalog, candidate_count=100, seed=SEED)
+    assert len(candidates) == 100
+    negatives = candidates[:-1]
+    assert candidates[99] == case.label_item_id
+    assert len(set(negatives)) == 99
+    assert all(item in catalog.items for item in negatives)
+    assert not (set(negatives) & set(catalog.user_items["u0"]))
+    assert sample_candidates(case, catalog, candidate_count=100, seed=SEED) == candidates
+
+
+def test_negative_sampling_varies_with_seed_and_stage():
+    catalog = make_catalog(150)
+    case_k3 = Case("u0", 3, ("t00",), "t03")
+    case_k5 = Case("u0", 5, ("t00",), "t03")
+    assert sample_candidates(case_k3, catalog, 10, SEED) != sample_candidates(case_k5, catalog, 10, SEED)
+    assert sample_candidates(case_k3, catalog, 10, SEED) != sample_candidates(case_k3, catalog, 10, SEED + 1)
+
+
+def test_negative_sampling_requires_enough_available_items():
+    catalog = make_catalog(5)
+    case = Case("u0", 3, ("t00", "t01", "t02"), "t03")
+    with pytest.raises(ValueError):
+        sample_candidates(case, catalog, candidate_count=10, seed=SEED)
+
+
+def test_stage_balanced_loss_gives_equal_stage_weights():
+    losses = torch.tensor([1.0, 1.0, 1.0, 1.0, 3.0])
+    stages = torch.tensor([0, 0, 0, 0, 1])
+    assert stage_balanced_loss(losses, stages).item() == pytest.approx(2.0)
+
+
+def test_stage_balanced_loss_over_five_stages():
+    losses = torch.tensor([0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0])
+    stages = torch.tensor([0, 0, 1, 1, 3, 3, 5, 5, 10, 10])
+    assert stage_balanced_loss(losses, stages).item() == pytest.approx(9.0)
+
+
+def test_train_fusion_rejects_test_group():
+    artifacts, catalog, cases = make_fixture()
+    with pytest.raises(ValueError):
+        train_fusion(artifacts, {"fusion": cases["fusion"], "test": cases["validation"]}, small_config(), catalog)
+
+
+def test_train_fusion_and_evaluate_are_deterministic():
+    artifacts, catalog, cases = make_fixture()
+    config = small_config()
+    first = train_fusion(artifacts, cases, config, catalog)
+    second = train_fusion(artifacts, cases, config, catalog)
+    assert first.best_epoch == second.best_epoch
+    assert first.split_sha256 == artifacts.split_sha256
+    for name in first.fusion_state:
+        assert torch.equal(first.fusion_state[name], second.fusion_state[name])
+    eval_cases = make_eval_cases()
+    checkpoint = EvalCheckpoint(base=artifacts, fusion_state=first.fusion_state, config=config)
+    metrics_first = evaluate(checkpoint, eval_cases, catalog)
+    metrics_second = evaluate(checkpoint, eval_cases, catalog)
+    assert metrics_first == metrics_second
+    assert set(metrics_first["methods"]["full"]) == {str(k) for k in K_VALUES}
+
+
+def test_evaluate_separates_unrecommendable_labels():
+    artifacts, catalog, cases = make_fixture()
+    config = small_config()
+    checkpoint = train_fusion(artifacts, cases, config, catalog)
+    eval_cases = make_eval_cases()
+    broken = Case("u3", 5, tuple(sorted(catalog.user_items["u3"])[:5]), "ghost-item")
+    metrics = evaluate(EvalCheckpoint(base=artifacts, fusion_state=checkpoint.fusion_state, config=config), eval_cases + [broken], catalog)
+    assert metrics["cases"]["total"] == len(eval_cases) + 1
+    assert metrics["cases"]["evaluated"] == len(eval_cases)
+    assert metrics["cases"]["unrecommendable"]["count"] == 1
