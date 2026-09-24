@@ -84,7 +84,10 @@ def user_views(events: list[Event], target: str) -> dict[str, dict]:
         target_events = sorted((e for e in user_events if e.domain == target), key=lambda e: (e.timestamp_ms, e.item_id))
         source_events = sorted((e for e in user_events if e.domain != target), key=lambda e: (e.timestamp_ms, e.domain, e.item_id))
         first_ts = target_events[0].timestamp_ms if target_events else None
-        usable_sources = [e for e in source_events if first_ts is not None and e.timestamp_ms < first_ts]
+        if first_ts is None:
+            usable_sources = list(source_events)
+        else:
+            usable_sources = [e for e in source_events if e.timestamp_ms < first_ts]
         views[user_id] = {
             "target_events": target_events,
             "source_events": source_events,
