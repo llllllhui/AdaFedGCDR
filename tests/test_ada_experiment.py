@@ -1,3 +1,4 @@
+import math
 import sys
 from pathlib import Path
 
@@ -12,11 +13,18 @@ from model.adafedgcdr.experiment import (
     Catalog,
     EvalCheckpoint,
     FusionConfig,
+    _collate,
+    _prepare_rows,
+    bootstrap_ci,
     evaluate,
+    fuse_user_vec,
+    paired_bootstrap_ci,
+    rank_metrics,
     sample_candidates,
     stage_balanced_loss,
     train_fusion,
 )
+from model.adafedgcdr.fusion import AdaptiveFusion
 
 D = 4
 SEED = 2026
@@ -139,7 +147,7 @@ def test_train_fusion_and_evaluate_are_deterministic():
     metrics_first = evaluate(checkpoint, eval_cases, catalog)
     metrics_second = evaluate(checkpoint, eval_cases, catalog)
     assert metrics_first == metrics_second
-    assert set(metrics_first["methods"]["full"]) == {str(k) for k in K_VALUES}
+    assert {"0", "1", "3", "5", "10"} <= set(metrics_first["methods"]["full"])
 
 
 def test_evaluate_separates_unrecommendable_labels():
@@ -152,3 +160,71 @@ def test_evaluate_separates_unrecommendable_labels():
     assert metrics["cases"]["total"] == len(eval_cases) + 1
     assert metrics["cases"]["evaluated"] == len(eval_cases)
     assert metrics["cases"]["unrecommendable"]["count"] == 1
+
+
+def test_rank_metrics_positive_first():
+    scores = torch.zeros(100)
+    scores[99] = 1.0
+    metrics = rank_metrics(scores, 99)
+    assert metrics["hr@5"] == metrics["hr@10"] == metrics["ndcg@5"] == metrics["ndcg@10"] == 1.0
+
+
+def test_rank_metrics_positive_sixth():
+    scores = torch.zeros(100)
+    scores[:5] = 2.0
+    scores[99] = 1.0
+    metrics = rank_metrics(scores, 99)
+    assert metrics["hr@5"] == metrics["ndcg@5"] == 0.0
+    assert metrics["hr@10"] == 1.0
+    assert metrics["ndcg@10"] == pytest.approx(1.0 / math.log2(7))
+
+
+def test_bootstrap_ci_is_reproducible():
+    values = [0.1, 0.5, 0.9, 0.2, 0.8, 0.3, 0.7, 0.4, 0.6, 1.0]
+    first = bootstrap_ci(values, seed=2026, draws=1000)
+    second = bootstrap_ci(values, seed=2026, draws=1000)
+    assert first == second
+    assert first[0] <= first[1]
+    assert bootstrap_ci(values, seed=2027, draws=1000) != first
+
+
+def test_paired_bootstrap_ci_is_reproducible():
+    full = [0.5, 0.6, 0.7, 0.4, 0.9]
+    baseline = [0.4, 0.6, 0.5, 0.5, 0.8]
+    first = paired_bootstrap_ci(full, baseline, seed=2026, draws=1000)
+    assert first == paired_bootstrap_ci(full, baseline, seed=2026, draws=1000)
+    assert first[0] <= first[1]
+
+
+def test_full_method_matches_fusion_module():
+    artifacts, catalog, cases = make_fixture()
+    model = AdaptiveFusion(num_sources=1)
+    rows, _ = _prepare_rows(cases["validation"][:1], artifacts, catalog, small_config())
+    batch = _collate(rows, torch.device("cpu"))
+    user_vec, personalized_mask = fuse_user_vec("full", model, batch)
+    ref_user_vec, _, _, ref_mask = model(
+        batch["source_vec"], batch["source_mask"], batch["source_count"], batch["history_vec"], batch["history_mask"]
+    )
+    assert torch.allclose(user_vec, ref_user_vec)
+    assert torch.equal(personalized_mask, ref_mask)
+
+
+def test_evaluate_reports_all_methods_with_statistics():
+    artifacts, catalog, cases = make_fixture()
+    config = small_config()
+    checkpoint = train_fusion(artifacts, cases, config, catalog)
+    metrics = evaluate(EvalCheckpoint(base=artifacts, fusion_state=checkpoint.fusion_state, config=config), make_eval_cases(), catalog)
+    assert set(metrics["methods"]) == {"source-only", "target-only", "fixed-0.5", "dynamic-only", "reliability-only", "full"}
+    for k in ("0", "1", "3", "5", "10"):
+        assert k in metrics["methods"]["full"]
+        assert 0.0 <= metrics["stages"][k]["missing_source_ratio"] <= 1.0
+    assert metrics["methods"]["target-only"]["0"]["applicable"] is False
+    assert metrics["methods"]["target-only"]["0"]["ndcg@10"] is None
+    for method in ("source-only", "fixed-0.5", "dynamic-only", "reliability-only", "full"):
+        summary = metrics["methods"][method]["user_mean_ndcg@10"]
+        assert summary["ci"][0] <= summary["ci"][1]
+    comparison = metrics["comparison"]
+    assert comparison["strongest_baseline"] in ("source-only", "fixed-0.5", "dynamic-only", "reliability-only")
+    assert comparison["paired_ndcg@10_diff"]["ci"][0] <= comparison["paired_ndcg@10_diff"]["ci"][1]
+    assert comparison["effective"] in (True, False)
+    assert 0.0 <= metrics["negative_transfer"]["user_ratio"] <= 1.0

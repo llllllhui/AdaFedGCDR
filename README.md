@@ -59,6 +59,10 @@ Here we list the recommendation performance comparison of our method and baselin
 </div>
 
 
+## AdaFedGCDR 冷启动验证版
+
+面向“目标域零交互到行为渐多”场景的离线验证管线位于 `model/adafedgcdr/`，在保留原始 `model/fedgcdr/` 基线不变的前提下，加入可靠性门控与随交互增长的表示融合。数据契约、命令、指标定义与结论边界见运行手册：[docs/adafedgcdr-runbook.md](./docs/adafedgcdr-runbook.md)。
+
 ## Citation
 
 If you find this work useful for your research, please kindly cite our paper:

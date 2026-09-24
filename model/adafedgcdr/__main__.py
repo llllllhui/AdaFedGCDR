@@ -23,6 +23,7 @@ from .experiment import (
     build_catalog,
     evaluate,
     load_fusion,
+    render_report,
     save_fusion,
     train_fusion,
 )
@@ -148,7 +149,10 @@ def cmd_evaluate(args):
     text = json.dumps(metrics, ensure_ascii=False, indent=2, allow_nan=False)
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text(text + "\n", encoding="utf-8")
+    report_path = Path(args.report) if args.report else Path(args.out).parent / "report.md"
+    report_path.write_text(render_report(metrics), encoding="utf-8")
     print(text)
+    print(f"报告已写入 {report_path}")
 
 
 def build_parser():
@@ -195,6 +199,7 @@ def build_parser():
     evaluate_parser.add_argument("--fusion", required=True)
     evaluate_parser.add_argument("--candidate-count", type=int, default=100)
     evaluate_parser.add_argument("--device", default="cpu")
+    evaluate_parser.add_argument("--report", default=None)
     evaluate_parser.add_argument("--out", required=True)
     evaluate_parser.set_defaults(func=cmd_evaluate)
     return parser
