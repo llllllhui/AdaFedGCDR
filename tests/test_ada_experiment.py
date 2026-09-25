@@ -133,6 +133,21 @@ def test_train_fusion_rejects_test_group():
         train_fusion(artifacts, {"fusion": cases["fusion"], "test": cases["validation"]}, small_config(), catalog)
 
 
+def test_train_fusion_requires_validation_rows():
+    artifacts, catalog, cases = make_fixture()
+    with pytest.raises(ValueError, match="验证样本"):
+        train_fusion(artifacts, {"fusion": cases["fusion"], "validation": []}, small_config(), catalog)
+
+
+def test_evaluate_requires_evaluable_rows():
+    artifacts, catalog, cases = make_fixture()
+    config = small_config()
+    checkpoint = train_fusion(artifacts, cases, config, catalog)
+    eval_checkpoint = EvalCheckpoint(base=artifacts, fusion_state=checkpoint.fusion_state, config=config)
+    with pytest.raises(ValueError, match="可评估用例"):
+        evaluate(eval_checkpoint, [], catalog)
+
+
 def test_train_fusion_and_evaluate_are_deterministic():
     artifacts, catalog, cases = make_fixture()
     config = small_config()

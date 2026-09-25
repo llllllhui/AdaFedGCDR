@@ -74,7 +74,7 @@ u001,Books,B000003,1293840060000
 
 ## 四个命令
 
-统一入口：`python -m model.adafedgcdr prepare|train-base|train-fusion|evaluate`（以下用 `.venv/bin/python -m model.adafedgcdr`）。所有命令都会校验数据与拆分的 SHA-256 与 checkpoint 相符，不匹配时直接报错退出。
+统一入口：`python -m model.adafedgcdr prepare|train-base|train-fusion|evaluate`（以下用 `.venv/bin/python -m model.adafedgcdr`）。所有命令都会校验数据与拆分的 SHA-256：`train-base` 对照 `prepare` 写出的审计文件（防止 prepare 之后数据被改动），`train-fusion` 与 `evaluate` 对照 checkpoint 中保存的哈希，不匹配时直接报错退出。
 
 ### 1. prepare —— 拆分与数据审计
 

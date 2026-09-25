@@ -40,6 +40,18 @@ def check_hashes(events_path, manifest, split_digest, events_digest, checkpoint_
         fail(f"{checkpoint_name} 的数据 SHA-256 与 {events_path} 不符（{stored_events} != {events_digest}）")
 
 
+def check_prepare_audit(events_path, split_path, manifest):
+    audit_path = Path(str(split_path) + ".audit.json")
+    if not audit_path.is_file():
+        fail(f"缺少审计文件 {audit_path}，请先对同一数据运行 prepare")
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    events_digest = file_sha256(events_path)
+    if audit.get("events_sha256") != events_digest:
+        fail(f"{events_path} 与 prepare 时的数据不符（数据在 prepare 之后被修改过）")
+    if audit.get("split_sha256") != manifest_sha256(manifest):
+        fail(f"{split_path} 与 prepare 审计中的拆分 SHA-256 不符")
+
+
 def cmd_prepare(args):
     events = load_events(args.events)
     manifest = build_split(events, args.target, args.seed)
@@ -61,6 +73,7 @@ def cmd_prepare(args):
 def cmd_train_base(args):
     events = load_events(args.events)
     manifest = load_manifest(args.split)
+    check_prepare_audit(args.events, args.split, manifest)
     config = BaseConfig(
         target_domain=manifest.target_domain,
         embedding_size=args.embedding_size,

@@ -405,6 +405,8 @@ def train_fusion(artifacts: BaseArtifacts, cases: dict, config: FusionConfig, ca
     val_rows, val_skipped = _prepare_rows(cases.get("validation", []), artifacts, catalog, config)
     if not train_rows:
         raise ValueError("没有可训练的融合样本（标签均不在目标域目录中）")
+    if not val_rows:
+        raise ValueError("没有可早停的验证样本（validation 组为空或标签均不在目标域目录中）")
     print(
         f"[train-fusion] seed={config.seed} train={len(train_rows)} 跳过={len(train_skipped)} "
         f"validation={len(val_rows)} 跳过={len(val_skipped)}"
@@ -464,6 +466,8 @@ def evaluate(checkpoint: EvalCheckpoint, cases: list, catalog: Catalog) -> dict:
     model = AdaptiveFusion(num_sources=len(checkpoint.base.domain_names)).to(torch.device(checkpoint.config.device))
     model.load_state_dict(checkpoint.fusion_state)
     rows, skipped_cases = _prepare_rows(cases, checkpoint.base, catalog, checkpoint.config)
+    if not rows:
+        raise ValueError("测试组没有可评估用例（test 组为空或标签均不在目标域目录中）")
     seed = checkpoint.config.seed
     method_records = {method: _case_records(model, rows, checkpoint.config, method) for method in METHODS}
     methods_metrics = {
