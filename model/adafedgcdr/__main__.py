@@ -5,6 +5,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from .base import BaseConfig, load_base, save_base, train_base
+from .batched import train_base_batched
 from .data import (
     DEFAULT_K_VALUES,
     audit_users,
@@ -27,6 +28,7 @@ from .experiment import (
     save_fusion,
     train_fusion,
 )
+from .device import report_device
 
 
 def fail(message: str):
@@ -74,6 +76,7 @@ def cmd_train_base(args):
     events = load_events(args.events)
     manifest = load_manifest(args.split)
     check_prepare_audit(args.events, args.split, manifest)
+    report_device(args.device, args.tf32)
     config = BaseConfig(
         target_domain=manifest.target_domain,
         embedding_size=args.embedding_size,
@@ -83,9 +86,10 @@ def cmd_train_base(args):
         user_batch=args.user_batch,
         dp=args.dp,
         device=args.device,
+        fast_sampling=args.fast_sampling,
         seed=manifest.seed,
     )
-    artifacts = train_base(events, manifest, config)
+    artifacts = train_base_batched(events, manifest, config) if args.batched else train_base(events, manifest, config)
     save_base(args.out, artifacts, config, file_sha256(args.events))
     print(
         json.dumps(
@@ -109,6 +113,7 @@ def cmd_train_fusion(args):
     manifest = load_manifest(args.split)
     split_digest = manifest_sha256(manifest)
     events_digest = file_sha256(args.events)
+    report_device(args.device, args.tf32)
     artifacts, _, base_events_digest = load_base(args.base)
     check_hashes(args.events, manifest, split_digest, events_digest, args.base, artifacts.split_sha256, base_events_digest)
     catalog = build_catalog(events, manifest, artifacts)
@@ -147,6 +152,7 @@ def cmd_evaluate(args):
     manifest = load_manifest(args.split)
     split_digest = manifest_sha256(manifest)
     events_digest = file_sha256(args.events)
+    report_device(args.device, args.tf32)
     artifacts, _, base_events_digest = load_base(args.base)
     check_hashes(args.events, manifest, split_digest, events_digest, args.base, artifacts.split_sha256, base_events_digest)
     fusion, fusion_events_digest = load_fusion(args.fusion)
@@ -187,7 +193,10 @@ def build_parser():
     train_base_parser.add_argument("--embedding-size", type=int, default=16)
     train_base_parser.add_argument("--local-epoch", type=int, default=3)
     train_base_parser.add_argument("--user-batch", type=int, default=16)
-    train_base_parser.add_argument("--device", default="cpu")
+    train_base_parser.add_argument("--device", default="cpu", help="cpu(默认)/auto/cuda/cuda:N/mps")
+    train_base_parser.add_argument("--batched", action="store_true", help="使用批处理实现（GPU 友好；数值与逐 client 实现不逐位一致）")
+    train_base_parser.add_argument("--fast-sampling", action="store_true", help="批量逐行去重（纯加速，数值与 --batched 一致）")
+    train_base_parser.add_argument("--tf32", action="store_true", help="开启 TF32 matmul（改变数值）")
     train_base_parser.add_argument("--dp", action=argparse.BooleanOptionalAction, default=True)
     train_base_parser.add_argument("--out", required=True)
     train_base_parser.set_defaults(func=cmd_train_base)
@@ -201,7 +210,8 @@ def build_parser():
     train_fusion_parser.add_argument("--max-epochs", type=int, default=50)
     train_fusion_parser.add_argument("--patience", type=int, default=5)
     train_fusion_parser.add_argument("--batch-size", type=int, default=64)
-    train_fusion_parser.add_argument("--device", default="cpu")
+    train_fusion_parser.add_argument("--device", default="cpu", help="cpu(默认)/auto/cuda/cuda:N/mps")
+    train_fusion_parser.add_argument("--tf32", action="store_true", help="开启 TF32 matmul（改变数值）")
     train_fusion_parser.add_argument("--out", required=True)
     train_fusion_parser.set_defaults(func=cmd_train_fusion)
 
@@ -211,7 +221,8 @@ def build_parser():
     evaluate_parser.add_argument("--base", required=True)
     evaluate_parser.add_argument("--fusion", required=True)
     evaluate_parser.add_argument("--candidate-count", type=int, default=100)
-    evaluate_parser.add_argument("--device", default="cpu")
+    evaluate_parser.add_argument("--device", default="cpu", help="cpu(默认)/auto/cuda/cuda:N/mps")
+    evaluate_parser.add_argument("--tf32", action="store_true", help="开启 TF32 matmul（改变数值）")
     evaluate_parser.add_argument("--report", default=None)
     evaluate_parser.add_argument("--out", required=True)
     evaluate_parser.set_defaults(func=cmd_evaluate)

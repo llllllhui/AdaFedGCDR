@@ -5,3 +5,10 @@ data/raw/
 artifacts/
 __pycache__/
 .pytest_cache/
+.commandcode/
+临时算力服务器.txt
+paper/FedGCDR.html
+adafedgcdr.egg-info/
+ratings-full.zip
+legacy/Data_Proc.py
+.DS_Store

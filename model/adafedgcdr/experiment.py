@@ -9,7 +9,9 @@ import torch.nn.functional as F
 
 from .base import BaseArtifacts
 from .data import Case, SplitManifest
+from .device import resolve_device
 from .fusion import AdaptiveFusion
+from .rank import batched_rank_metrics, metrics_to_python
 
 K_VALUES = (0, 1, 3, 5, 10)
 METHODS = ("source-only", "target-only", "fixed-0.5", "dynamic-only", "reliability-only", "full")
@@ -211,8 +213,8 @@ def _prepare_rows(cases, artifacts: BaseArtifacts, catalog: Catalog, config: Fus
 def _collate(rows, device):
     batch = {
         "user_id": [row["user_id"] for row in rows],
-        "k": torch.tensor([row["k"] for row in rows], dtype=torch.long),
-        "label_index": torch.tensor([row["label_index"] for row in rows], dtype=torch.long),
+        "k": torch.tensor([row["k"] for row in rows], dtype=torch.long, device=device),
+        "label_index": torch.tensor([row["label_index"] for row in rows], dtype=torch.long, device=device),
         "candidate_items": [row["candidate_items"] for row in rows],
     }
     for key in ("source_vec", "source_mask", "source_count", "history_vec", "history_mask", "candidate_item_vectors", "candidate_pop"):
@@ -231,9 +233,10 @@ def _score(method: str, model: AdaptiveFusion, batch, fallback: bool):
 def _case_records(model, rows, config: FusionConfig, method: str = "full", fallback: bool = True) -> list[dict]:
     records = []
     model.eval()
-    with torch.no_grad():
+    device = resolve_device(config.device)
+    with torch.inference_mode():
         for start in range(0, len(rows), config.batch_size):
-            batch = _collate(rows[start : start + config.batch_size], torch.device(config.device))
+            batch = _collate(rows[start : start + config.batch_size], device)
             if method == "target-only":
                 keep = [i for i, k in enumerate(batch["k"].tolist()) if k > 0]
                 if not keep:
@@ -243,19 +246,12 @@ def _case_records(model, rows, config: FusionConfig, method: str = "full", fallb
                     for key, value in batch.items()
                 }
             scores, _ = _score(method, model, batch, fallback)
-            for position in range(len(batch["user_id"])):
-                values = scores[position].detach().cpu().tolist()
-                order = _rank_order(values)
-                label_index = int(batch["label_index"][position])
-                metrics = _metrics_from_rank(order.index(label_index))
-                records.append(
-                    {
-                        "user_id": batch["user_id"][position],
-                        "k": int(batch["k"][position]),
-                        "top10_items": [batch["candidate_items"][position][index] for index in order[:10]],
-                        **metrics,
-                    }
-                )
+            label_index = batch["label_index"]
+            metrics = batched_rank_metrics(scores, label_index)
+            rows_batch = rows[start : start + config.batch_size]
+            if method == "target-only":
+                rows_batch = [rows_batch[i] for i in keep]
+            records.extend(metrics_to_python(metrics, rows_batch, batch["candidate_items"]))
     return records
 
 
@@ -397,7 +393,7 @@ def train_fusion(artifacts: BaseArtifacts, cases: dict, config: FusionConfig, ca
     random.seed(config.seed)
     np.random.seed(config.seed)
     torch.manual_seed(config.seed)
-    device = torch.device(config.device)
+    device = resolve_device(config.device)
 
     model = AdaptiveFusion(num_sources=len(artifacts.domain_names)).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
@@ -463,7 +459,7 @@ def train_fusion(artifacts: BaseArtifacts, cases: dict, config: FusionConfig, ca
 
 
 def evaluate(checkpoint: EvalCheckpoint, cases: list, catalog: Catalog) -> dict:
-    model = AdaptiveFusion(num_sources=len(checkpoint.base.domain_names)).to(torch.device(checkpoint.config.device))
+    model = AdaptiveFusion(num_sources=len(checkpoint.base.domain_names)).to(resolve_device(checkpoint.config.device))
     model.load_state_dict(checkpoint.fusion_state)
     rows, skipped_cases = _prepare_rows(cases, checkpoint.base, catalog, checkpoint.config)
     if not rows:

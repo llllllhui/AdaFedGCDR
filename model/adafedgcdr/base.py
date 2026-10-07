@@ -10,6 +10,7 @@ import torch
 from ..fedgcdr.model import MLP
 from ..fedgcdr.party import Client, Server
 from .data import SplitManifest, manifest_sha256, user_views
+from .device import resolve_device
 
 
 @dataclass(frozen=True)
@@ -25,6 +26,7 @@ class BaseConfig:
     delta: float = 1e-5
     dp: bool = True
     device: str = "cpu"
+    fast_sampling: bool = False
     seed: int = 2026
 
 
@@ -47,7 +49,7 @@ def train_base(events, manifest: SplitManifest, config: BaseConfig) -> BaseArtif
     random.seed(config.seed)
     np.random.seed(config.seed)
     torch.manual_seed(config.seed)
-    device = torch.device(config.device)
+    device = resolve_device(config.device)
 
     views = user_views(events, target)
     if not views:
@@ -96,7 +98,7 @@ def train_base(events, manifest: SplitManifest, config: BaseConfig) -> BaseArtif
         num_domain=num_domain,
         num_users=len(user_ids),
         embedding_size=config.embedding_size,
-        device=config.device,
+        device=str(device),
         user_batch=config.user_batch,
         lr_gat=config.lr_gat,
         lr_mf=0.005,

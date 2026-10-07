@@ -108,11 +108,56 @@ u001,Books,B000003,1293840060000
 | `--embedding-size` | 嵌入维度（默认 16） |
 | `--local-epoch` | 本地训练轮数（默认 3） |
 | `--user-batch` | 用户批大小（默认 16） |
-| `--device` | `cpu` 或 `cuda:N` |
+| `--device` | `cpu`（默认）/ `auto` / `cuda` / `cuda:N` / `mps`，见下节 |
+| `--batched` | 使用批处理实现（GPU 友好；数值与逐 client 实现不逐位一致，见下节） |
+| `--fast-sampling` | 批量逐行去重（**纯加速**，数值与 `--batched` 逐位一致） |
+| `--tf32` | 开启 TF32 matmul（**改变数值**，仅 CUDA 生效） |
 | `--dp` / `--no-dp` | 导出时是否加差分隐私噪声（默认开） |
 | `--out` | 输出 checkpoint 路径 |
 
 `base.pt` 字段：`domain_names`（源域名单，与向量第 1 维对齐）、`source_vectors[user_id]`（`[源域数, D]`）、`source_counts`、`source_mask`（缺失源域为 `False` 且向量为零，不把噪声当历史）、`target_items`（字典序物品→索引）、`target_item_vectors`、`target_train_users`（仅 A 组）、`split_sha256`，以及完整配置、种子与数据 SHA-256。**不保存任何 B/C/D 的目标域用户 embedding。**
+
+### 设备选择与性能实况
+
+`--device` 默认 `cpu`；`auto` 按探测顺序 CUDA → MPS → CPU 选择加速器。无论哪种取值都始终打印实际设备：
+
+```
+[device] cuda:0 (NVIDIA A100, torch 2.14.0)
+[device] mps (mps, torch 2.14.0)
+[device] cpu (torch 2.14.0)
+```
+
+默认不用 `auto` 的两个原因：本管线实测 MPS 比 CPU 慢约 4.5 倍（见下），Apple Silicon 上 `auto` 恰好选中它；且 `auto` 在不同机器落到不同设备，浮点结果随设备变化，破坏跨机数值复现。需要 GPU 时请显式指定。
+
+显式指定不可用的加速器会**立即退出**并给出可操作提示，而不是延迟到某个张量分配处抛出无信息量的 RuntimeError。
+
+**实测结论：本管线的瓶颈是 Python 循环，不是算力，GPU 后端通常不划算。**
+
+默认嵌入维度 `d=16`，GAT 核心是 `[B, 1+lmax, 16] @ [B, 16, 16]` 的 `bmm`（单次约几万 FLOP），每 chunk 仅 `local_epoch`（默认 3）组。全量下 chunk 数约 `轮数 × 用户数 / user_batch`，**kernel launch 开销远大于其计算量**。
+
+在合成数据（100 用户、200 目标物品）上以 `--source-rounds 5 --target-rounds 5` 实测：
+
+| 模式 | `--device cpu` | `--device mps` |
+|---|---|---|
+| 默认 | 1.25 s | 5.70 s |
+| `--fast-sampling` | 1.04 s | 4.67 s |
+
+MPS 比 CPU 慢约 4.5 倍——跨设备搬运与 launch 开销完全压过计算量。**`cpu` 既是默认值也是最稳的选择**；只有当 `--user-batch` 调大到数百、batch 内矩阵变大之后，GPU 才可能转正。（上表为 `--batched` 路径的实测。）
+
+#### 提速手段与代价
+
+| 手段 | 提速 | 代价 |
+|---|---|---|
+| `--batched` | GPU 路径的前提；CPU 上也更快 | 算法与 RNG 流与 `train_base` 等价，但**数值不逐位一致**且随训练放大，见下 |
+| `--user-batch 256/512` | Python 循环次数降一个量级 | **放大语义偏差**，见下 |
+| `--fast-sampling` | 约 10% | 无——纯加速开关，数值与 `--batched` 逐位一致 |
+| `--tf32` | 仅 CUDA | **改变数值**，需重跑基线 |
+
+**`--batched` 与逐 client 实现的数值关系：** 两条路径消耗完全相同的 RNG 流（同样的 shuffle、DP 噪声与负采样），算法语义等价；但批处理重写了算子形状（`bmm`/`einsum` 替代 `matmul`/`Linear`），浮点求和顺序不同，ULP 级差异会被上千次 Adam 步放大——实测合成数据 150+150 轮后物品向量最大差约 1.5。**两条实现的产物不可混用**；复现旧基线请用不带 `--batched` 的 `train_base`，新实验统一用 `--batched` 并在记录中注明。
+
+**`--user-batch` 的语义偏差（重要）：** `user_batch=1` 时 `batched.py` 的聚合语义与原版一致（数值仍不逐位一致，见上）；`user_batch>1` 时 chunk 内共享可训练叶子、梯度求和共用单一 Adam 状态，聚合用长度加权平均替代原版逐 client EMA。调大到 256/512 会放大该偏差，**调大后必须重跑全部基线并重新校准**，不能与既有 `base.pt` 混用。
+
+**会改变数值的因素**：`--tf32`、非默认 `--user-batch`，以及 `--batched` 与逐 client 实现之间的选择。它们各自的产物固定 seed 后均可复现，但**相互之间不可混用**。"固定种子后完全可复现"的承诺对同一条路径成立；`--fast-sampling` 不是其中之一，它只改速度不改数值。
 
 ### 3. train-fusion —— 按冷启动阶段训练融合器
 
@@ -127,7 +172,8 @@ u001,Books,B000003,1293840060000
 | `--base` | 基础表示 checkpoint（会被哈希校验） |
 | `--candidate-count` | 每个样本的候选数（负物品数 + 1 个正物品，默认 100） |
 | `--lr` / `--max-epochs` / `--patience` | 学习率（默认 1e-3）、最大 epoch（默认 50）、早停耐心（默认 5） |
-| `--batch-size` / `--device` | 批大小（默认 64）、设备 |
+| `--batch-size` / `--device` | 批大小（默认 64）、设备（同 `train-base`） |
+| `--tf32` | 开启 TF32 matmul（**改变数值**） |
 | `--out` | 输出 checkpoint 路径 |
 
 训练只优化 `AdaptiveFusion` 参数，基础向量全部冻结；损失按 k 分阶段取均值后五阶段等权平均，样本数不均不会改变阶段权重；早停与最优 checkpoint 依据 C 组验证 NDCG@10。训练日志逐 epoch 输出五阶段验证指标，并在结尾输出早停轮次与随机种子。
@@ -209,7 +255,7 @@ u001,Books,B000003,1293840060000
 ```bash
 .venv/bin/python tests/make_synthetic_events.py
 .venv/bin/python -m model.adafedgcdr prepare --events artifacts/synthetic/events.csv --target Books --seed 2026 --split artifacts/synthetic/split.json
-.venv/bin/python -m model.adafedgcdr train-base --events artifacts/synthetic/events.csv --split artifacts/synthetic/split.json --source-rounds 1 --target-rounds 1 --device cpu --out artifacts/synthetic/base.pt
+.venv/bin/python -m model.adafedgcdr train-base --events artifacts/synthetic/events.csv --split artifacts/synthetic/split.json --source-rounds 1 --target-rounds 1 --batched --device cpu --out artifacts/synthetic/base.pt
 .venv/bin/python -m model.adafedgcdr train-fusion --events artifacts/synthetic/events.csv --split artifacts/synthetic/split.json --base artifacts/synthetic/base.pt --candidate-count 10 --out artifacts/synthetic/fusion.pt
 .venv/bin/python -m model.adafedgcdr evaluate --events artifacts/synthetic/events.csv --split artifacts/synthetic/split.json --base artifacts/synthetic/base.pt --fusion artifacts/synthetic/fusion.pt --candidate-count 10 --out artifacts/synthetic/metrics.json
 ```
