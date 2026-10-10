@@ -1,0 +1,91 @@
+{
+  "checks": {
+    "sparse": {
+      "candidate_and_cohort_identical_across_seeds": true,
+      "method_cohorts_paired": true,
+      "stages": [
+        "sparse-k1",
+        "sparse-k10",
+        "sparse-k3",
+        "sparse-k5"
+      ]
+    },
+    "cold": {
+      "candidate_and_cohort_identical_across_seeds": true,
+      "method_cohorts_paired": true,
+      "stages": [
+        "cold"
+      ]
+    }
+  },
+  "comparisons": {
+    "sparse": {
+      "FedGCDR-original": {
+        "users": 241,
+        "full_mean": 0.08911891512388134,
+        "baseline_mean": 0.22215916208475364,
+        "difference": -0.1330402469608723,
+        "paired_user_bootstrap_95ci": [
+          -0.16577924822307943,
+          -0.09992898712696757
+        ]
+      }
+    },
+    "cold": {
+      "source-only": {
+        "users": 280,
+        "full_mean": 0.06352135403771111,
+        "baseline_mean": 0.05975349674115253,
+        "difference": 0.0037678572965585888,
+        "paired_user_bootstrap_95ci": [
+          -0.005976745746992946,
+          0.013335304952780885
+        ]
+      },
+      "fixed-0.5": {
+        "users": 280,
+        "full_mean": 0.06352135403771111,
+        "baseline_mean": 0.05993512933774977,
+        "difference": 0.003586224699961353,
+        "paired_user_bootstrap_95ci": [
+          0.0011146513024112524,
+          0.006310616000771619
+        ]
+      },
+      "dynamic-only": {
+        "users": 280,
+        "full_mean": 0.06352135403771111,
+        "baseline_mean": 0.06391273435287192,
+        "difference": -0.00039138031516079783,
+        "paired_user_bootstrap_95ci": [
+          -0.0010643877405574229,
+          7.122124610769824e-06
+        ]
+      },
+      "reliability-only": {
+        "users": 280,
+        "full_mean": 0.06352135403771111,
+        "baseline_mean": 0.0595580230559065,
+        "difference": 0.0039633309818046135,
+        "paired_user_bootstrap_95ci": [
+          0.001637824544483208,
+          0.006665051423379877
+        ]
+      },
+      "popularity": {
+        "users": 280,
+        "full_mean": 0.06352135403771111,
+        "baseline_mean": 0.24963479344161793,
+        "difference": -0.18611343940390676,
+        "paired_user_bootstrap_95ci": [
+          -0.2193905451957106,
+          -0.15286589625372587
+        ]
+      }
+    }
+  },
+  "strongest_cold_baseline": "popularity",
+  "cold_k0_vs_source_only_difference": 0.0,
+  "cold_effective_under_all_baseline_criterion": false,
+  "interpretation": "Individual bootstrap intervals are reported for every prespecified baseline. Cold effectiveness requires a positive lower interval bound against all comparable five-stage baselines and no k=0 loss vs source-only; target-only is excluded from the five-stage comparison."
+}

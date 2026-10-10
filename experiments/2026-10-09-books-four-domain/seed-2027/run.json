@@ -1,0 +1,80 @@
+{
+  "args": {
+    "events": "<private-events.csv>",
+    "out": "<private-results-directory>",
+    "target": "Books",
+    "seeds": [
+      2027
+    ],
+    "device": "cuda:0",
+    "source_rounds": 5,
+    "warm_rounds": 5,
+    "transfer_rounds": 5,
+    "fine_rounds": 20,
+    "gate_epochs": 50,
+    "patience": 5,
+    "item_core": 1,
+    "protocols": "sparse,cold",
+    "k_values": "1,3,5,10",
+    "development_users": "<private-development-users.json>"
+  },
+  "events_sha256": "df9945b70887fac226d5915e6966b5bae9cf26a1d64035df55ffe572968bc482",
+  "split": {
+    "target_domain": "Books",
+    "seed": 2026,
+    "group_sizes": {
+      "base": 2572,
+      "fusion": 858,
+      "validation": 548,
+      "test": 370
+    }
+  },
+  "original_code_sha256": {
+    "model/fedgcdr/party.py": "77d1fda2a2dd92ef0afed6584d5fc32f755b20d83767e23b07120909c7f04d33",
+    "model/fedgcdr/model.py": "a41f494219c4e9fd969fcf07ba02057a79f46507c53cd0c79245e0dcbcaa3a69"
+  },
+  "python": "3.10.16 (main, Dec 11 2024, 16:24:50) [GCC 11.2.0]",
+  "implementation_code_sha256": {
+    "model/adafedgcdr/paper.py": "3cc7f509795c95d383a3691b99b8878eb47b674ce2ffc66257606cc8dd118814",
+    "model/adafedgcdr/experiment.py": "a22863dc2255d32da085801c80628880debb9428809f782571b97f85c03c9aba",
+    "scripts/run_paper_comparison.py": "7bd67391439f9237434014eaddf7de85f7ff88ea58b7c64cc5e6d9aa965e72c1"
+  },
+  "development_users_sha256": "863b237cccc4d39bc1170afe8d27eb8f22b0c347030bd9c587f4a110972192e2",
+  "torch": "2.7.1+cu126",
+  "started_at": "2026-10-09T20:35:39+0800",
+  "status": "complete",
+  "completed": [
+    {
+      "seed": 2027,
+      "protocol": "sparse",
+      "k": 1,
+      "seconds": 1793.067539576441
+    },
+    {
+      "seed": 2027,
+      "protocol": "sparse",
+      "k": 3,
+      "seconds": 1903.3664407134056
+    },
+    {
+      "seed": 2027,
+      "protocol": "sparse",
+      "k": 5,
+      "seconds": 1978.633757814765
+    },
+    {
+      "seed": 2027,
+      "protocol": "sparse",
+      "k": 10,
+      "seconds": 2005.0594886131585
+    },
+    {
+      "seed": 2027,
+      "protocol": "cold",
+      "k": null,
+      "seconds": 1182.8937101140618
+    }
+  ],
+  "finished_at": "2026-10-09T23:10:01+0800",
+  "quarantined_development_user_count": 103
+}

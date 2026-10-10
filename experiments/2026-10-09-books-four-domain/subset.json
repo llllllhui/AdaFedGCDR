@@ -1,0 +1,26 @@
+{
+  "seed": 2026,
+  "target": "Books",
+  "sources": [
+    "CDs",
+    "Movies",
+    "Clothing"
+  ],
+  "user_hash_prefilter": "crc32(user_id) % 20 == 0",
+  "eligible_pool": 4348,
+  "selected_users": 4348,
+  "events_by_domain": {
+    "Clothing": 4560,
+    "Books": 93026,
+    "CDs": 2862,
+    "Movies": 3732
+  },
+  "excluded": {
+    "target_below_11": 228930,
+    "no_source_before_first_target": 18607,
+    "target_above_100_small_run_limit": 833
+  },
+  "small_run_limits": "11-100 unique target items; at most 100 usable items per source domain; no item-core filtering",
+  "source_history": "strictly before first target interaction",
+  "elapsed_seconds": 75.86029027000768
+}

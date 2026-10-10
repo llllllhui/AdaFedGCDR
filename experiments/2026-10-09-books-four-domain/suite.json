@@ -1,0 +1,142 @@
+{
+  "status": "complete",
+  "started_at": "2026-10-09T20:35:36+0800",
+  "args": {
+    "events": "<private-events.csv>",
+    "out": "<private-results-directory>",
+    "target": "Books",
+    "seeds": [
+      2026,
+      2027,
+      2028
+    ],
+    "device": "cuda:0",
+    "source_rounds": 5,
+    "warm_rounds": 5,
+    "transfer_rounds": 5,
+    "fine_rounds": 20,
+    "gate_epochs": 50,
+    "patience": 5,
+    "item_core": 1,
+    "protocols": "sparse,cold",
+    "k_values": "1,3,5,10",
+    "development_users": "<private-development-users.json>"
+  },
+  "workers": {
+    "2026": {
+      "status": "complete",
+      "exit_code": 0,
+      "phase": "fit gate=full train=1352 val=850",
+      "completed": [
+        {
+          "seed": 2026,
+          "protocol": "sparse",
+          "k": 1,
+          "seconds": 1826.5479716993868
+        },
+        {
+          "seed": 2026,
+          "protocol": "sparse",
+          "k": 3,
+          "seconds": 1942.238441657275
+        },
+        {
+          "seed": 2026,
+          "protocol": "sparse",
+          "k": 5,
+          "seconds": 1989.6694607362151
+        },
+        {
+          "seed": 2026,
+          "protocol": "sparse",
+          "k": 10,
+          "seconds": 2043.5296567045152
+        },
+        {
+          "seed": 2026,
+          "protocol": "cold",
+          "k": null,
+          "seconds": 1191.1489112339914
+        }
+      ],
+      "error": null
+    },
+    "2027": {
+      "status": "complete",
+      "exit_code": 0,
+      "phase": "fit gate=full train=1352 val=850",
+      "completed": [
+        {
+          "seed": 2027,
+          "protocol": "sparse",
+          "k": 1,
+          "seconds": 1793.067539576441
+        },
+        {
+          "seed": 2027,
+          "protocol": "sparse",
+          "k": 3,
+          "seconds": 1903.3664407134056
+        },
+        {
+          "seed": 2027,
+          "protocol": "sparse",
+          "k": 5,
+          "seconds": 1978.633757814765
+        },
+        {
+          "seed": 2027,
+          "protocol": "sparse",
+          "k": 10,
+          "seconds": 2005.0594886131585
+        },
+        {
+          "seed": 2027,
+          "protocol": "cold",
+          "k": null,
+          "seconds": 1182.8937101140618
+        }
+      ],
+      "error": null
+    },
+    "2028": {
+      "status": "complete",
+      "exit_code": 0,
+      "phase": "fit gate=full train=1352 val=850",
+      "completed": [
+        {
+          "seed": 2028,
+          "protocol": "sparse",
+          "k": 1,
+          "seconds": 1788.8321719765663
+        },
+        {
+          "seed": 2028,
+          "protocol": "sparse",
+          "k": 3,
+          "seconds": 1902.4837189018726
+        },
+        {
+          "seed": 2028,
+          "protocol": "sparse",
+          "k": 5,
+          "seconds": 1974.4549531377852
+        },
+        {
+          "seed": 2028,
+          "protocol": "sparse",
+          "k": 10,
+          "seconds": 2005.2288869842887
+        },
+        {
+          "seed": 2028,
+          "protocol": "cold",
+          "k": null,
+          "seconds": 1183.8088070861995
+        }
+      ],
+      "error": null
+    }
+  },
+  "elapsed_seconds": 9438.78278875351
+}

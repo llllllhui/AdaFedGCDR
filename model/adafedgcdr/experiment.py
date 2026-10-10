@@ -144,6 +144,10 @@ def fuse_user_vec(method: str, fusion: AdaptiveFusion, batch):
     history_mask = batch["history_mask"]
     count = history_mask.sum(dim=1)
     local = (history_vec * history_mask[..., None]).sum(dim=1) / count.clamp_min(1)[:, None]
+    if method == "target-only":
+        # Unknown history items provide no target signal; use popularity rather
+        # than silently borrowing a source representation in this baseline.
+        return local, count > 0
     agreement = F.cosine_similarity(source_vec, local[:, None, :], dim=-1)
     agreement = torch.where(count[:, None] > 0, agreement, torch.zeros_like(agreement))
     if method in ("reliability-only", "full"):
@@ -154,6 +158,8 @@ def fuse_user_vec(method: str, fusion: AdaptiveFusion, batch):
         source_weight = source_mask.float() / source_mask.sum(dim=1, keepdim=True).clamp_min(1)
     source = (source_weight[..., None] * source_vec).sum(dim=1)
     has_source = source_mask.any(dim=1)
+    if method == "source-only":
+        return source, has_source
     if method == "target-only":
         weight = torch.ones(count.shape[0], device=source_vec.device)
     elif method == "source-only":

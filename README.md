@@ -63,6 +63,8 @@ Here we list the recommendation performance comparison of our method and baselin
 
 面向“目标域零交互到行为渐多”场景的离线验证管线位于 `model/adafedgcdr/`，在保留原始 `model/fedgcdr/` 基线不变的前提下，加入可靠性门控与随交互增长的表示融合。数据契约、命令、指标定义与结论边界见运行手册：[docs/adafedgcdr-runbook.md](./docs/adafedgcdr-runbook.md)。
 
+四域三种子对比已完成，代码、训练日志、汇总结果、图表与跨电脑交接说明见 [实验交接记录](./experiments/2026-10-09-books-four-domain/README.md)，评估设置见 [论文实验协议](./docs/paper-experiment-protocol.md)。本轮固定预算结果不支持当前融合头优于原版或流行度基线；下一步诊断见 [分析笔记](./experiments/2026-10-09-books-four-domain/analysis-notes.md)。原始交互数据、逐用户记录、checkpoint和连接凭据不包含在公开仓库中。
+
 ## Citation
 
 If you find this work useful for your research, please kindly cite our paper:
@@ -74,5 +76,4 @@ If you find this work useful for your research, please kindly cite our paper:
   year={2024}
 }
 ```
-
 

@@ -1,0 +1,1356 @@
+{
+  "training_seed": 2026,
+  "protocol": "sparse",
+  "k_values": [
+    3
+  ],
+  "audit": {
+    "fusion": {
+      "total": 858,
+      "unknown_label": 0,
+      "no_known_prefix": 0,
+      "evaluated": 858
+    },
+    "validation": {
+      "total": 548,
+      "unknown_label": 358,
+      "no_known_prefix": 50,
+      "evaluated": 140
+    },
+    "test": {
+      "total": 370,
+      "unknown_label": 243,
+      "no_known_prefix": 18,
+      "evaluated": 109
+    },
+    "fixed-label": {
+      "total": 133,
+      "unknown_label": 78,
+      "no_known_prefix": 0,
+      "evaluated": 55
+    }
+  },
+  "backbone": {
+    "fine_trace": [
+      {
+        "epoch": 0,
+        "validation_ndcg@10": 0.10105075182482806
+      },
+      {
+        "epoch": 1,
+        "validation_ndcg@10": 0.11389836683694064
+      },
+      {
+        "epoch": 2,
+        "validation_ndcg@10": 0.1439805575109538
+      },
+      {
+        "epoch": 3,
+        "validation_ndcg@10": 0.18979116133172383
+      },
+      {
+        "epoch": 4,
+        "validation_ndcg@10": 0.20695219303719314
+      },
+      {
+        "epoch": 5,
+        "validation_ndcg@10": 0.22442449064907746
+      },
+      {
+        "epoch": 6,
+        "validation_ndcg@10": 0.23189191466110073
+      },
+      {
+        "epoch": 7,
+        "validation_ndcg@10": 0.2543226273930803
+      },
+      {
+        "epoch": 8,
+        "validation_ndcg@10": 0.27160042348923835
+      },
+      {
+        "epoch": 9,
+        "validation_ndcg@10": 0.28326075876997125
+      },
+      {
+        "epoch": 10,
+        "validation_ndcg@10": 0.29085796303483674
+      },
+      {
+        "epoch": 11,
+        "validation_ndcg@10": 0.3006339418540977
+      },
+      {
+        "epoch": 12,
+        "validation_ndcg@10": 0.3051089823319825
+      },
+      {
+        "epoch": 13,
+        "validation_ndcg@10": 0.3118198448604096
+      },
+      {
+        "epoch": 14,
+        "validation_ndcg@10": 0.32010374791377244
+      },
+      {
+        "epoch": 15,
+        "validation_ndcg@10": 0.3241004752217913
+      },
+      {
+        "epoch": 16,
+        "validation_ndcg@10": 0.32895031525234303
+      },
+      {
+        "epoch": 17,
+        "validation_ndcg@10": 0.33856252617933463
+      },
+      {
+        "epoch": 18,
+        "validation_ndcg@10": 0.346168211602084
+      },
+      {
+        "epoch": 19,
+        "validation_ndcg@10": 0.3515442041623593
+      }
+    ],
+    "selected_fine_epoch": 19,
+    "catalog_size": 56444,
+    "target_clients": 4021,
+    "protocol": "sparse",
+    "k": 3
+  },
+  "candidate_sha256": "d202aa3df3a35d588cc1ac926ff9ee1bbe3d3503a3e87c08b24c5c1b24598626",
+  "checks": {
+    "finite_item_vectors": true,
+    "cold_target_users_isolated": null,
+    "candidate_count": 100,
+    "catalog_from_training_groups_only": true
+  },
+  "gate_training": {
+    "dynamic-only": {
+      "trace": [
+        {
+          "epoch": 0,
+          "validation_ndcg@10": 0.13410652683511728
+        },
+        {
+          "epoch": 1,
+          "validation_ndcg@10": 0.13410652683511728
+        },
+        {
+          "epoch": 2,
+          "validation_ndcg@10": 0.13410652683511728
+        },
+        {
+          "epoch": 3,
+          "validation_ndcg@10": 0.13147031078919913
+        },
+        {
+          "epoch": 4,
+          "validation_ndcg@10": 0.13147031078919913
+        },
+        {
+          "epoch": 5,
+          "validation_ndcg@10": 0.1305350982636887
+        }
+      ],
+      "best_validation_ndcg@10": 0.13410652683511728,
+      "best_epoch": 0,
+      "method": "dynamic-only"
+    },
+    "reliability-only": {
+      "trace": [
+        {
+          "epoch": 0,
+          "validation_ndcg@10": 0.09179945451608659
+        },
+        {
+          "epoch": 1,
+          "validation_ndcg@10": 0.09179945451608659
+        },
+        {
+          "epoch": 2,
+          "validation_ndcg@10": 0.09179945451608659
+        },
+        {
+          "epoch": 3,
+          "validation_ndcg@10": 0.09179945451608659
+        },
+        {
+          "epoch": 4,
+          "validation_ndcg@10": 0.09179945451608659
+        },
+        {
+          "epoch": 5,
+          "validation_ndcg@10": 0.09179945451608659
+        }
+      ],
+      "best_validation_ndcg@10": 0.09179945451608659,
+      "best_epoch": 0,
+      "method": "reliability-only"
+    },
+    "full": {
+      "trace": [
+        {
+          "epoch": 0,
+          "validation_ndcg@10": 0.13410652683511728
+        },
+        {
+          "epoch": 1,
+          "validation_ndcg@10": 0.13410652683511728
+        },
+        {
+          "epoch": 2,
+          "validation_ndcg@10": 0.13410652683511728
+        },
+        {
+          "epoch": 3,
+          "validation_ndcg@10": 0.13147031078919913
+        },
+        {
+          "epoch": 4,
+          "validation_ndcg@10": 0.13147031078919913
+        },
+        {
+          "epoch": 5,
+          "validation_ndcg@10": 0.1305350982636887
+        }
+      ],
+      "best_validation_ndcg@10": 0.13410652683511728,
+      "best_epoch": 0,
+      "method": "full"
+    }
+  },
+  "methods": {
+    "source-only": {
+      "0": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "1": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "3": {
+        "applicable": true,
+        "count": 109,
+        "hr@5": 0.009174311926605505,
+        "hr@5_ci": [
+          0.0,
+          0.027522935779816515
+        ],
+        "hr@10": 0.03669724770642202,
+        "hr@10_ci": [
+          0.009174311926605505,
+          0.07339449541284404
+        ],
+        "ndcg@5": 0.005788346363040895,
+        "ndcg@5_ci": [
+          0.0,
+          0.017365039089122684
+        ],
+        "ndcg@10": 0.014470016171205035,
+        "ndcg@10_ci": [
+          0.0026519708836503474,
+          0.030062230069329114
+        ],
+        "coverage@10": 0.017911558358727233
+      },
+      "5": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "10": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "user_mean_ndcg@10": {
+        "value": 0.014470016171205035,
+        "ci": [
+          0.0026519708836503474,
+          0.030062230069329114
+        ],
+        "k_values": [
+          0,
+          1,
+          3,
+          5,
+          10
+        ]
+      }
+    },
+    "target-only": {
+      "0": {
+        "applicable": false,
+        "count": 0,
+        "hr@5": null,
+        "hr@10": null,
+        "ndcg@5": null,
+        "ndcg@10": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "1": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "3": {
+        "applicable": true,
+        "count": 109,
+        "hr@5": 0.12844036697247707,
+        "hr@5_ci": [
+          0.07339449541284404,
+          0.1926605504587156
+        ],
+        "hr@10": 0.1834862385321101,
+        "hr@10_ci": [
+          0.11009174311926606,
+          0.25688073394495414
+        ],
+        "ndcg@5": 0.09378132782888511,
+        "ndcg@5_ci": [
+          0.04499665475266552,
+          0.14336513854485336
+        ],
+        "ndcg@10": 0.11127709754724775,
+        "ndcg@10_ci": [
+          0.06334951941816624,
+          0.162028804883148
+        ],
+        "coverage@10": 0.01890369215505634
+      },
+      "5": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "10": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "user_mean_ndcg@10": {
+        "value": 0.11127709754724775,
+        "ci": [
+          0.06334951941816624,
+          0.162028804883148
+        ],
+        "k_values": [
+          1,
+          3,
+          5,
+          10
+        ]
+      }
+    },
+    "fixed-0.5": {
+      "0": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "1": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "3": {
+        "applicable": true,
+        "count": 109,
+        "hr@5": 0.08256880733944955,
+        "hr@5_ci": [
+          0.03669724770642202,
+          0.13761467889908258
+        ],
+        "hr@10": 0.09174311926605505,
+        "hr@10_ci": [
+          0.03669724770642202,
+          0.14678899082568808
+        ],
+        "ndcg@5": 0.06897048220922936,
+        "ndcg@5_ci": [
+          0.027686078539504583,
+          0.11364085144251873
+        ],
+        "ndcg@10": 0.07223843805425707,
+        "ndcg@10_ci": [
+          0.03107204410306919,
+          0.11827314044697265
+        ],
+        "coverage@10": 0.018673375380908512
+      },
+      "5": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "10": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "user_mean_ndcg@10": {
+        "value": 0.07223843805425707,
+        "ci": [
+          0.03107204410306919,
+          0.11827314044697265
+        ],
+        "k_values": [
+          0,
+          1,
+          3,
+          5,
+          10
+        ]
+      }
+    },
+    "dynamic-only": {
+      "0": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "1": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "3": {
+        "applicable": true,
+        "count": 109,
+        "hr@5": 0.11009174311926606,
+        "hr@5_ci": [
+          0.05504587155963303,
+          0.1651376146788991
+        ],
+        "hr@10": 0.13761467889908258,
+        "hr@10_ci": [
+          0.07339449541284404,
+          0.2018348623853211
+        ],
+        "ndcg@5": 0.08731910606244037,
+        "ndcg@5_ci": [
+          0.04128440366972477,
+          0.1345549988548941
+        ],
+        "ndcg@10": 0.09661676083198188,
+        "ndcg@10_ci": [
+          0.048633302712513586,
+          0.14426647878040716
+        ],
+        "coverage@10": 0.01879739210544965
+      },
+      "5": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "10": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "user_mean_ndcg@10": {
+        "value": 0.09661676083198188,
+        "ci": [
+          0.048633302712513586,
+          0.14426647878040716
+        ],
+        "k_values": [
+          0,
+          1,
+          3,
+          5,
+          10
+        ]
+      }
+    },
+    "reliability-only": {
+      "0": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "1": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "3": {
+        "applicable": true,
+        "count": 109,
+        "hr@5": 0.08256880733944955,
+        "hr@5_ci": [
+          0.03669724770642202,
+          0.13761467889908258
+        ],
+        "hr@10": 0.09174311926605505,
+        "hr@10_ci": [
+          0.03669724770642202,
+          0.14678899082568808
+        ],
+        "ndcg@5": 0.06897048220922936,
+        "ndcg@5_ci": [
+          0.027686078539504583,
+          0.11364085144251873
+        ],
+        "ndcg@10": 0.07223843805425707,
+        "ndcg@10_ci": [
+          0.03107204410306919,
+          0.11827314044697265
+        ],
+        "coverage@10": 0.018673375380908512
+      },
+      "5": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "10": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "user_mean_ndcg@10": {
+        "value": 0.07223843805425707,
+        "ci": [
+          0.03107204410306919,
+          0.11827314044697265
+        ],
+        "k_values": [
+          0,
+          1,
+          3,
+          5,
+          10
+        ]
+      }
+    },
+    "full": {
+      "0": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "1": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "3": {
+        "applicable": true,
+        "count": 109,
+        "hr@5": 0.11009174311926606,
+        "hr@5_ci": [
+          0.05504587155963303,
+          0.1651376146788991
+        ],
+        "hr@10": 0.13761467889908258,
+        "hr@10_ci": [
+          0.07339449541284404,
+          0.2018348623853211
+        ],
+        "ndcg@5": 0.08731910606244037,
+        "ndcg@5_ci": [
+          0.04128440366972477,
+          0.1345549988548941
+        ],
+        "ndcg@10": 0.09661676083198188,
+        "ndcg@10_ci": [
+          0.048633302712513586,
+          0.14426647878040716
+        ],
+        "coverage@10": 0.01879739210544965
+      },
+      "5": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "10": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "user_mean_ndcg@10": {
+        "value": 0.09661676083198188,
+        "ci": [
+          0.048633302712513586,
+          0.14426647878040716
+        ],
+        "k_values": [
+          0,
+          1,
+          3,
+          5,
+          10
+        ]
+      }
+    },
+    "popularity": {
+      "0": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "1": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "3": {
+        "applicable": true,
+        "count": 109,
+        "hr@5": 0.3944954128440367,
+        "hr@5_ci": [
+          0.3119266055045872,
+          0.48623853211009177
+        ],
+        "hr@10": 0.4954128440366973,
+        "hr@10_ci": [
+          0.41284403669724773,
+          0.5779816513761468
+        ],
+        "ndcg@5": 0.3043557764119796,
+        "ndcg@5_ci": [
+          0.22924935795568163,
+          0.3744187691372208
+        ],
+        "ndcg@10": 0.33756176974700325,
+        "ndcg@10_ci": [
+          0.2683032477859099,
+          0.40692412843749926
+        ],
+        "coverage@10": 0.017982425058465028
+      },
+      "5": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "10": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "user_mean_ndcg@10": {
+        "value": 0.33756176974700325,
+        "ci": [
+          0.2683032477859099,
+          0.40692412843749926
+        ],
+        "k_values": [
+          0,
+          1,
+          3,
+          5,
+          10
+        ]
+      }
+    },
+    "FedGCDR-original": {
+      "0": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "1": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "3": {
+        "applicable": true,
+        "count": 109,
+        "hr@5": 0.3577981651376147,
+        "hr@5_ci": [
+          0.27522935779816515,
+          0.44036697247706424
+        ],
+        "hr@10": 0.43119266055045874,
+        "hr@10_ci": [
+          0.3394495412844037,
+          0.5137614678899083
+        ],
+        "ndcg@5": 0.2863168619194531,
+        "ndcg@5_ci": [
+          0.21567233719011306,
+          0.35907536245223654
+        ],
+        "ndcg@10": 0.30979725922324886,
+        "ndcg@10_ci": [
+          0.23800346489495272,
+          0.3787300805347993
+        ],
+        "coverage@10": 0.018673375380908512
+      },
+      "5": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "10": {
+        "applicable": true,
+        "count": 0,
+        "hr@5": null,
+        "hr@5_ci": [
+          null,
+          null
+        ],
+        "hr@10": null,
+        "hr@10_ci": [
+          null,
+          null
+        ],
+        "ndcg@5": null,
+        "ndcg@5_ci": [
+          null,
+          null
+        ],
+        "ndcg@10": null,
+        "ndcg@10_ci": [
+          null,
+          null
+        ],
+        "coverage@10": null
+      },
+      "user_mean_ndcg@10": {
+        "value": 0.30979725922324886,
+        "ci": [
+          0.23800346489495272,
+          0.3787300805347993
+        ],
+        "k_values": [
+          0,
+          1,
+          3,
+          5,
+          10
+        ]
+      }
+    }
+  },
+  "robustness": {},
+  "original_cold_note": null,
+  "publication_note": "Aggregate metrics and traces only. User-level records and checkpoints remain private."
+}

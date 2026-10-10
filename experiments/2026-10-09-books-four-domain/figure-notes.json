@@ -1,0 +1,6 @@
+{
+  "matplotlib": "3.10.3",
+  "error_bars": "sample standard deviation over independent training seeds",
+  "main_plot": "conditional on labels in training catalog; sparse additionally requires a known prefix",
+  "target_only": "k=0 excluded; aggregate not directly comparable to all-five-stage methods"
+}

@@ -1,0 +1,39 @@
+......................................................................   [100%]
+=============================== warnings summary ===============================
+tests/test_ada_base.py::test_config
+  /data/coding/AdaFedGCDR-paper-20261009-r1/.venv/lib/python3.10/site-packages/_pytest/python.py:161: PytestReturnNotNoneWarning: Test functions should return None, but tests/test_ada_base.py::test_config returned <class 'model.adafedgcdr.base.BaseConfig'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+tests/test_ada_base.py::test_target_training_only_touches_base_users
+tests/test_ada_base.py::test_bcd_target_events_do_not_leak_into_item_vectors
+tests/test_ada_base.py::test_train_base_is_reproducible
+tests/test_ada_base.py::test_export_covers_expected_users_masks_and_catalog
+tests/test_ada_base.py::test_save_and_load_roundtrip
+tests/test_ada_batched.py::test_fast_sampling_is_bit_identical
+tests/test_ada_batched.py::test_batched_tracks_original_at_user_batch_one
+  /data/coding/AdaFedGCDR-paper-20261009-r1/model/fedgcdr/party.py:22: FutureWarning: `nn.init.uniform` is now deprecated in favor of `nn.init.uniform_`.
+    torch.nn.init.uniform(self.U, a=0., b=1.)
+
+tests/test_ada_base.py::test_target_training_only_touches_base_users
+tests/test_ada_base.py::test_bcd_target_events_do_not_leak_into_item_vectors
+tests/test_ada_base.py::test_train_base_is_reproducible
+tests/test_ada_base.py::test_export_covers_expected_users_masks_and_catalog
+tests/test_ada_base.py::test_save_and_load_roundtrip
+tests/test_ada_batched.py::test_fast_sampling_is_bit_identical
+tests/test_ada_batched.py::test_batched_tracks_original_at_user_batch_one
+  /data/coding/AdaFedGCDR-paper-20261009-r1/model/fedgcdr/party.py:23: FutureWarning: `nn.init.uniform` is now deprecated in favor of `nn.init.uniform_`.
+    torch.nn.init.uniform(self.V, a=0., b=1.)
+
+tests/test_ada_base.py::test_target_training_only_touches_base_users
+tests/test_ada_base.py::test_bcd_target_events_do_not_leak_into_item_vectors
+tests/test_ada_base.py::test_train_base_is_reproducible
+tests/test_ada_base.py::test_export_covers_expected_users_masks_and_catalog
+tests/test_ada_base.py::test_save_and_load_roundtrip
+tests/test_ada_batched.py::test_batched_tracks_original_at_user_batch_one
+  /data/coding/AdaFedGCDR-paper-20261009-r1/model/fedgcdr/party.py:262: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+    temp_vec = Client.l2_clip(torch.tensor(self.knowledge[j][0], device=self.args.device), self.sensitivity)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+70 passed, 21 warnings in 56.18s
